@@ -125,5 +125,5 @@ STATIC_URL = '/static/'
 
 # Set backend port to 3000
 CORS_ORIGIN_WHITELIST = [
-         'https://localhost:3000'
+         'http://localhost:3000'
 ]
