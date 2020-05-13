@@ -1,16 +1,7 @@
 import React, { Component } from 'react';
 import Modal from "./components/Modal";
-import logo from './logo.svg';
+import axios from 'axios'
 import './App.css';
-
-const todoItems = [
-  {
-    id: 1,
-    title: "Finish this App",
-    description: "Try to complete both the frontend and backend of this App",
-    completed: false
-  }
-];
 
 class App extends Component {
 
@@ -24,9 +15,20 @@ class App extends Component {
         description: "",
         completed: false
       },
-      todoList: todoItems 
+      todoList: []
     };
   }
+
+  componentDidMount() {
+    this.refreshList();
+  }
+
+  refreshList = () => {
+    axios
+      .get("http://localhost:8000/api/todos/")
+      .then((res) => this.setState({ todoList: res.data }))
+      .catch(err => console.log(err));
+  };
 
   toggle = () => {
     this.setState({ modal: !this.state.modal });
@@ -34,20 +36,30 @@ class App extends Component {
 
   handleSubmit = (item) => {
     this.toggle();
-    alert("Save " + JSON.stringify(item));
+    if (item.id) {
+      axios
+        .put(`http://localhost:8000/api/todos/${item.id}/`, item)
+        .then((res) => this.refreshList());
+      return;
+    }
+    axios
+      .post("http://localhost:8000/api/todos/", item)
+      .then((res) => this.refreshList());
   };
 
   handleDelete = (item) => {
-    alert("Delete " + JSON.stringify(item));
+    axios
+      .delete(`http://localhost:8000/api/todos/${item.id}/`)
+      .then((res) => this.refreshList());
   };
 
   createItem = () => {
     const item = {title: "", description: "", completed: false};
-    this.setState( {activeItem: item, modal: !this.state.modal} );
+    this.setState({ activeItem: item, modal: !this.state.modal });
   };
 
   editItem = (item) => {
-    this.setState( {activeItem: item, modal: !this.state.modal} );
+    this.setState({ activeItem: item, modal: !this.state.modal });
   };
 
   displayCompleted = (status) => {
@@ -79,7 +91,7 @@ class App extends Component {
   renderItems = () => {
     const { viewCompleted } = this.state;
     const newItems = this.state.todoList.filter(
-      (item) => item.completed == viewCompleted
+      (item) => item.completed === viewCompleted
     );
 
     return newItems.map((item) => (
@@ -100,13 +112,14 @@ class App extends Component {
             onClick={() => this.editItem(item)}
             className="btn btn-secondary mr-2"
           >
-            Edit
+            {" "}
+            Edit{" "}
           </button>
           <button
             onClick={() => this.handleDelete(item)}
             className="btn btn-danger"
           >
-            Delete
+            Delete{" "}
           </button>
         </span>
       </li>
@@ -125,7 +138,7 @@ class App extends Component {
                   Add task
                 </button>
               </div>
-              {this.renderTabList}
+              {this.renderTapList()}
               <ul className="list-group list-group-flush">
                 {this.renderItems()}
               </ul>
@@ -143,28 +156,5 @@ class App extends Component {
     );
   }
 }
-
-/*
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
-*/
 
 export default App;
