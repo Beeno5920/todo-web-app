@@ -63,13 +63,13 @@ import {
                         </FormGroup>
                         <FormGroup check>
                             <Label for="Completed">
-                                Completed
                                 <Input
                                     type="checkbox"
                                     name="completed"
                                     checked={this.state.activeItem.completed}
                                     onChange={this.handleChange}
                                 />
+                                Completed
                             </Label>
                         </FormGroup>
                     </Form>
